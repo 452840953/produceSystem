@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>我的生活</title>
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+        <link rel="shortcut icon" href="/favicon.ico">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+        <link rel="stylesheet" href="/banshi/public/sui-mobile/dist/css/sm.min.css">
+        <link rel="stylesheet" href="/banshi/public/sui-mobile/dist/css/sm-extend.min.css">
+
+    </head>
+    <body>
+        <div class="page-group">
+            <div class="page page-current">
+                <!-- 你的html代码 -->
+                <div class="page-index">
+                    <div class="card">
+                        <div style="background-image:url(//gqianniu.alicdn.com/bao/uploaded/i4//tfscom/i3/TB10LfcHFXXXXXKXpXXXXXXXXXX_!!0-item_pic.jpg_250.3.0q60.jpg)" valign="bottom" class="card-header color-white no-border">生产进度：<span class="status"></span></div>
+                        <div class="card-content">
+                            <div class="card-content-inner">
+                                <p class="color-gray">更新于 <span class="time"></span></p>
+                                <p id="info">
+                                    
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src='//cdn.bootcss.com/jquery/3.1.1/jquery.min.js'></script>
+        <script src='/banshi/public/sui-mobile/dist/js/sm.js'></script>
+        <script src='/banshi/public/sui-mobile/dist/js/sm-extend.js'></script>
+        <script type="text/javascript" src="/banshi/public/static/base.js"></script>
+        <script>
+            getinfo(); 
+            function getinfo() {
+                // body...
+               $.ajax({
+                   type: "get",           //因为是传输文件，所以必须是post
+                   url: '/banshi/public/index/base/getnowwork?id='+getQueryVariable("id"),         //对应的后台处理类的地址
+                   processData: false,
+                   contentType: false,
+                   dataType:"json",
+                   success: function (data) {
+                        console.log(data);
+                        $(".time").html(data.time);
+                        $(".status").html(data.status);
+                        if(data.status=="已完工"){
+                            var info = '当前生产计划：'+data.name+'<br>'
+                            +'描述：'+data.descs+'<br>';
+                        }else{
+                            var info = '当前工作计划：工作计划'+data.id+'<br>'
+                            +'生产产品：'+data.material+'<br>'
+                            +'总价值：'+data.total+'<br>'
+                            +'单价：'+data.price+'<br>'
+                            +'数量：'+data.num+'<br>'
+                            +'工艺1：'+data.route1+'<br>'
+                            +'工艺2：'+data.route2+'<br>'
+                            +'描述：'+data.descs+'<br>';
+                        }
+                        $("#info").html(info);
+                    }
+               });
+            }
+        </script>
+    </body>
+
+</html>

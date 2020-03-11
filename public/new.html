@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <title>板式家具生产管理系统</title>
+        <meta charset="UTF-8"/>
+        <!-- Bootstrap -->
+        <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
+        <link href="assets/styles.css" rel="stylesheet" media="screen">
+        <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="vendors/flot/excanvas.min.js"></script><![endif]-->
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <script src="vendors/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+    </head>
+    
+    <body onunload="goodbye()">
+            <div class="modal fade" id="workinfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">工作计划详情与物料清单</h4>
+                </div>
+                <div class="modal-body">
+                    <button class="btn btn-danger" id="diework">删除该工作计划</button>
+                    <br>
+                    <br>
+                    <table class="table">
+                        <tr>
+                            <th>计划序列号：<span id="workplanid"></span></th>
+                            <th>描述:<span id="workplandescs"></span></th>
+                            <th>生产:<span id="workproduce"></span></th>
+                            <th>班组:<span id="workteam"></span></th>
+                        </tr>
+                        <tr>
+                            <th colspan="4" style="text-align: center;">物料清单</th>
+                        </tr>
+                        <tr>
+                            <th>产品id</th>
+                            <th>产品名</th>
+                            <th>数量</th>
+                            <th>操作</th>
+                        </tr>
+                        <tbody id="materiallist">
+                            
+                        </tbody>
+                    </table>
+                    <div class="form-group">
+                        <label for="name">配方</label>
+                        <select id="peifang" onchange="changepeifang()">
+                        </select>
+                    </div>
+                    <form role="form" id="addMform" onsubmit="return false" action="#" method="post">
+                        <div id="kucunlist">
+                        </div>
+                        <div class="form-group">
+                            <label for="name">物料(由库存来)</label>
+                            <select id="listmaterialid" onchange="changematerial()">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">数量</label>
+                            <input type="text" class="form-control" name="materialnum" id="materialnum" style="width: 90%" placeholder="请输入数量" required="required" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="name">描述</label>
+                            <input type="text" class="form-control" name="materialdescs" id="materialdescs" style="width: 90%" placeholder="请输入描述" required="required" value="无">
+                        </div>
+                        <div style="text-align: center">
+                            <button type="submit" id="addmaterial" class="btn btn-success">新增物料</button>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+         <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">录入新的工作计划</h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form" id="addform" onsubmit="return false" action="#" method="post">
+                        <div class="form-group">
+                            <label for="name">生产品(由库存来)</label>
+                            <select id="materialid">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">工艺路线</label>
+                            <select id="routeid">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">替代工艺</label>
+                            <select id="routeid2">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">生产班组</label>
+                            <select id="team">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">单价</label>
+                            <input type="text" class="form-control" name="price" id="price" style="width: 90%" placeholder="请输入单价" required="required">
+                        </div>
+                        <div class="form-group">
+                            <label for="name">产量</label>
+                            <input type="text" class="form-control" name="num" id="num" style="width: 90%" placeholder="请输入产量" required="required">
+                        </div>
+                        <div class="form-group">
+                            <label for="name">描述</label>
+                            <input type="text" class="form-control" name="descs" id="descs" style="width: 90%" placeholder="请输入描述" required="required" value="无">
+                        </div>
+                        <div style="text-align: center">
+                            <button type="submit" id="addb" class="btn btn-success">录入</button>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <div class="modal fade" id="order" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">修改工作计划顺序</h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form" id="orderform" onsubmit="return false" action="#" method="post">
+                        <div class="form-group">
+                            <label for="name">旧顺序</label>
+                            <input type="text" class="form-control" name="oldorder" id="oldorder" style="width: 90%" placeholder="这是旧的顺序" readonly="readonly" required="required">
+                            <p>将此处的旧顺序重新排列录入到下面的表单中即可</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">新顺序</label>
+                            <input type="text" class="form-control" name="neworder" id="neworder" style="width: 90%" placeholder="请输入新顺序" required="required">
+                        </div>
+                        <div style="text-align: center">
+                            <button type="submit" id="orderb" class="btn btn-success">录入</button>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+       <div class="navbar navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span>
+                     <span class="icon-bar"></span>
+                     <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="index.html">板式家具生产管理系统</a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav pull-right">
+                            <li class="dropdown">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-user"></i><span class="adminname"></span>  <i class="caret"></i>
+
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a tabindex="-1" onclick="logout()" href="#">注销</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span3" id="sidebar">
+                    <ul class="nav nav-list bs-docs-sidenav nav-collapse collapse">
+                        <li>
+                            <a href="index.html"><i class="icon-chevron-right"></i> 主面板</a>
+                        </li>
+                        <li>
+                            <a href="material.html"><i class="icon-chevron-right"></i> 库存管理</a>
+                        </li>
+                        <li>
+                            <a href="route.html"><i class="icon-chevron-right"></i> 工艺路线管理</a>
+                        </li>
+                        <li>
+                            <a href="team.html"><i class="icon-chevron-right"></i> 班组管理</a>
+                        </li>
+                        <li class="active">
+                            <a href="produceplan.html"><i class="icon-chevron-right"></i> 生产计划管理</a>
+                        </li>
+                        <li>
+                            <a href="admin.html"><i class="icon-chevron-right"></i> 管理员管理</a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!--/span-->
+                <div class="span9" id="content">
+                    <div class="row-fluid">
+                        <div class="alert alert-success">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <h4>欢迎您</h4>
+                            本页面可进行生产计划的配置，物料清单的管理</div>
+                            <div class="navbar">
+                                <div class="navbar-inner">
+                                    <ul class="breadcrumb">
+                                        <li>
+                                            <a href="index.html">主面板</a> <span class="divider">/</span> 
+                                        </li>
+                                        <li class="active">生产计划新增</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                     <!-- wizard -->
+                    <div class="row-fluid section">
+                         <!-- block -->
+                        <div class="block">
+                            <div class="navbar navbar-inner block-header">
+                                <div class="muted pull-left">生产计划新增</div>
+                            </div>
+                            <div class="block-content collapse in">
+                                <div class="span12">
+                                    <div id="rootwizard">
+                                        <div class="navbar">
+                                          <div class="navbar-inner">
+                                            <div class="container">
+                                        <ul>
+                                            <li><a href="#tab1" data-toggle="tab">基本信息录入</a></li>
+                                            <li><a href="#tab2" data-toggle="tab">工作计划录入</a></li>
+                                            <li><a href="#tab3" data-toggle="tab">计划确认</a></li>
+                                        </ul>
+                                         </div>
+                                          </div>
+                                        </div>
+                                        <div id="bar" class="progress progress-striped active">
+                                          <div class="bar"></div>
+                                        </div>
+                                        <div class="tab-content">
+                                            <div class="tab-pane" id="tab1">
+                                               <form class="form-horizontal">
+                                                  <fieldset>
+                                                    <div class="control-group">
+                                                      <label class="control-label" for="focusedInput">计划名</label>
+                                                      <div class="controls">
+                                                        <input onchange="planvalue('name',this)" class="input-xlarge focused" id="name" name="name" type="text" value="" placeholder="请输入计划名">
+                                                      </div>
+                                                    </div>
+                                                    <div class="control-group">
+                                                      <label class="control-label" for="focusedInput">计划描述</label>
+                                                      <div class="controls">
+                                                        <textarea onchange="planvalue('descs',this)" class="form-contro" id="desc" name="desc" style="width: 300px" placeholder="请录入您的计划描述"></textarea>
+                                                      </div>
+                                                    </div>
+                                                  </fieldset>
+                                                </form>
+                                            </div>
+                                            <div class="tab-pane" id="tab2">
+                                                <div class="">
+                                                  <button class="btn btn-success" data-toggle="modal" data-target="#add"> 新增工作计划</button>
+                                                  <button class="btn btn-warning" data-toggle="modal" data-target="#order"> 修改顺序</button>
+                                                  <button class="btn btn-success" onclick="clean()"> 清空工作序列</button>
+                                                </div>
+                                                <br>
+                                                <br>
+                                                <div class="btn-group" style="display: -webkit-box;-webkit-overflow-scrolling: touch;-ms-overflow-style: none;overflow: -moz-scrollbars-none;width: 400px">
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane" id="tab3">
+                                                <table class="table table-hover table-striped">
+                                                    <tr>
+                                                        <th colspan="4" style="text-align: center">
+                                                            生产计划详情
+                                                        </th>
+                                                    <tr>
+                                                    <tr>
+                                                        <th colspan="2" style="text-align: center">
+                                                            生产计划名
+                                                        </th>
+                                                        <th colspan="2" style="text-align: center">
+                                                            生产计划描述
+                                                        </th>
+                                                    <tr>
+                                                    <tr>
+                                                        <td colspan="2" style="text-align: center" id="proname"></td>
+                                                        <td colspan="2" style="text-align: center" id="prodescs"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4" style="text-align: center">下辖工作计划</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4">
+                                                            <div class="btn-group" style="display: -webkit-box;-webkit-overflow-scrolling: touch;-ms-overflow-style: none;overflow: -moz-scrollbars-none;width: 400px">
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4" style="text-align: center">总物料清单</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>产品id</th>
+                                                        <th>产品名</th>
+                                                        <th>数量</th>
+                                                        <th>操作</th>
+                                                    </tr>
+                                                    <tbody id="allmateriallist">
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <ul class="pager wizard">
+                                                <li class="previous first" style="display:none;"><a href="javascript:void(0);">First</a></li>
+                                                <li class="previous"><a href="javascript:void(0);">上一面</a></li>
+                                                <li class="next last" style="display:none;"><a href="javascript:void(0);">最后</a></li>
+                                                <li class="next"><a href="javascript:void(0);">下一面</a></li>
+                                                <li class="next finish" style="display:none;"><a onclick="post()" href="javascript:;">投产</a></li>
+                                            </ul>
+                                        </div>  
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /block -->
+                    </div>
+                <!-- /wizard -->
+                </div>
+            </div>
+            <hr>
+            <footer>
+                <p>&copy; 2020 - 毕业设计</p>
+            </footer>
+        </div>
+        <!--/.fluid-container-->
+
+       <link href="vendors/datepicker.css" rel="stylesheet" media="screen">
+        <link href="vendors/uniform.default.css" rel="stylesheet" media="screen">
+        <link href="vendors/chosen.min.css" rel="stylesheet" media="screen">
+
+        <link href="vendors/wysiwyg/bootstrap-wysihtml5.css" rel="stylesheet" media="screen">
+
+        <script src="vendors/jquery-1.9.1.js"></script>
+        <script src="bootstrap/js/bootstrap.min.js"></script>
+        <script src="vendors/jquery.uniform.min.js"></script>
+        <script src="vendors/chosen.jquery.min.js"></script>
+        <script src="vendors/bootstrap-datepicker.js"></script>
+
+        <script src="vendors/wysiwyg/wysihtml5-0.3.0.js"></script>
+        <script src="vendors/wysiwyg/bootstrap-wysihtml5.js"></script>
+
+        <script src="vendors/wizard/jquery.bootstrap.wizard.min.js"></script>
+
+    <script type="text/javascript" src="vendors/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="assets/form-validation.js"></script>
+        <script src="assets/DT_bootstrap.js"></script>
+        <script src="static/base.js"></script>
+        <script>
+        function post() {
+               var formData = new FormData();
+               formData.append("materiallist", Storage.get("list"));
+               formData.append("workplan", Storage.get("author"));
+               formData.append("name", Storage.get("name"));
+               formData.append("descs", Storage.get("descs"));
+               $.ajax({
+                   type: "POST",           //因为是传输文件，所以必须是post
+                   url: '/banshi/public/index/base/addproject',         //对应的后台处理类的地址
+                   data: formData,
+                   processData: false,
+                   contentType: false,
+                   dataType:"json",
+                   success: function (data) {
+                        console.log(data);
+                       alert("计划已经投产");
+                            if (confirm("继续录入？")) {  
+                            }  
+                            else {  
+                               window.location.href="produceplan.html";
+                            }  
+                       }
+               });
+        }
+        window.onbeforeunload=function(e){     
+        　　var e = window.event||e;  
+        　　e.returnValue=("信息尚未提交！离开页面后信息不做保存！");
+        }
+        jQuery(document).ready(function() {   
+           FormValidation.init();
+           var info = getall("material");
+           material(info);
+           var info = getall("processroute");
+           processroute(info)
+           var info = getall("team");
+           team(info)
+           var info = getall("peifang");
+           pf(info)
+
+           Storage.set("list",null);
+           Storage.set("author",null);
+           Storage.set("name","");
+           Storage.set("descs","");
+        });
+        $("#addmaterial").click(function () {
+            var arr = getFormDate("addMform");
+            var a = new Array();
+            arr[arr.length]=parseInt($("#workplanid").html());
+            var kucun = JSON.parse(Storage.get("list"));
+            if(!(kucun==null||kucun=="null")){
+                for (var i = kucun.length - 1; i >= 0; i--) {
+                    //判断同名
+                    console.log(kucun[i][0])
+                    console.log(kucun[i][4])
+                    console.log(arr[0])
+                    console.log(arr[4])
+                    if(kucun[i][0]==arr[0]&&kucun[i][4]==arr[4]){
+                        alert("已经录入该材料");
+                        return;
+                    }
+                }
+            }
+            //判断库存
+            console.log(arr[0]);
+            console.log(arr[1]);
+            console.log($("."+arr[0]).html());
+            if(parseInt($("."+arr[0]).html())<arr[1]){
+                alert("库存不足！");
+                return;
+            }
+            if(Storage.get("list")==null||Storage.get("list")=="null"){
+                a[0] = arr;
+                console.log(a);
+                console.log(JSON.stringify(a));
+                Storage.set("list",JSON.stringify(a));
+                console.log(Storage.get("list"));
+            }else{
+                console.log(Storage.get("list"));
+                a = JSON.parse(Storage.get("list"));
+                console.log(a);
+                console.log(JSON.stringify(a));
+                a[a.length] = arr;
+                Storage.set("list",JSON.stringify(a));
+            }
+            //降低库存
+            console.log(arr[0]);
+            console.log(arr[1]);
+            console.log($("."+arr[0]).html());
+            console.log($("."+arr[0]).html()-arr[1]);
+
+            $("."+arr[0]).html($("."+arr[0]).html()-arr[1]);
+            if (confirm("继续录入？")) {  
+            }else {  
+                $('#addmaterial').modal('hide')
+            }  
+        });
+        $("#addb").click(function () {
+            var arr = getFormDate("addform");
+            var a=new Array();;
+            console.log(Storage.get("author"));
+            if(Storage.get("author")==null||Storage.get("author")=="null"){
+                arr[7]=arr[5]*arr[4];
+                a[0] = arr;
+                console.log(a);
+                console.log(JSON.stringify(a));
+                Storage.set("author",JSON.stringify(a));
+                console.log(Storage.get("author"));
+            }else{
+                arr[7]=arr[5]*arr[4];
+                console.log(Storage.get("author"));
+                a = JSON.parse(Storage.get("author"));
+                console.log(a);
+                console.log(JSON.stringify(a));
+                a[a.length] = arr;
+                Storage.set("author",JSON.stringify(a));
+            }
+            if (confirm("继续录入？")) {  
+
+            }else {  
+                $('#add').modal('hide')
+            }  
+        });
+        $("#orderb").click(function () {
+            var newo = new Array();
+            var order = $("#neworder").val();
+            console.log(order);
+            for(i=0;i<order.length;i++){
+                var o = order.charAt(i);
+                var a = JSON.parse(Storage.get("author"));
+                newo[i]=a[o];
+            }
+            Storage.set("author",JSON.stringify(newo));
+        });
+        function changematerial() {
+            // body...
+            var info = getall("material");
+            for (var i = info.length - 1; i >= 0; i--) {
+                $("#"+info[i]["id"]).hide();
+            }
+            var id = $("#listmaterialid").val();
+            $("#"+id).show();
+        }
+        function changepeifang() {
+            // body...
+            var pf = $("#peifang").val();
+            var a = JSON.parse(pf);
+            console.log(a);
+            if(Storage.get("list")==null||Storage.get("list")=="null"){
+                var oa = new Array();
+                for (var i = 0; i < a.length; i++) {
+                    var v = a[i];
+                    //判断库存
+                    if(parseInt($("."+a[i][0]).html())<a[i][1]){
+                        alert("库存不足！");
+                        return;
+                    }
+                    oa[i]=new Array(); 
+                    oa[i][0]=a[i][0];
+                    oa[i][1]=a[i][1];
+                    oa[i][2]="无";
+                    oa[i][3]="";
+                    oa[i][4]=$("#workplanid").html();
+                    $("."+a[i][0]).html($("."+a[i][0]).html()-a[i][1]);
+                }
+                console.log(oa);
+                Storage.set("list",JSON.stringify(oa));
+            }else{
+                var oa = JSON.parse(Storage.get("list"));
+                for (var i = 0; i < a.length; i++) {
+                    var v = a[i];
+                    if(parseInt($("."+a[i][0]).html())<a[i][1]){
+                        alert("库存不足！");
+                        return;
+                    }
+                    var num = oa.length;
+                    oa[num]=new Array(); 
+                    oa[num][0]=a[i][0];
+                    oa[num][1]=a[i][1];
+                    oa[num][2]="无";
+                    oa[num][3]="";
+                    oa[num][4]=$("#workplanid").html();
+                    $("."+a[i][0]).html($("."+a[i][0]).html()-a[i][1]);
+                }
+                Storage.set("list",JSON.stringify(oa));
+            }
+        }
+        function dellist(id) {
+            // body...
+            var a = JSON.parse(Storage.get("list"));
+            a.splice(id, 1);
+            Storage.set("list",JSON.stringify(a));
+        }
+        function delwork(id) {
+            // body...
+            var a = JSON.parse(Storage.get("author"));
+            a.splice(id, 1);
+            dellistbyworkid(id);
+            Storage.set("author",JSON.stringify(a));
+            $("#workinfo").modal("hide");
+        }
+        function dellistbyworkid(id) {
+            // body...
+            var a = JSON.parse(Storage.get("list"));
+            for (var i = a.length - 1; i >= 0; i--) {
+                if(a[i][3]==id){
+                    a.splice(i, 1);
+                }
+            }
+            Storage.set("list",JSON.stringify(a));
+        }
+        function info(id) {
+            // body...
+            // console.log("序列号"+(id+1));
+            // console.log(JSON.parse(Storage.get("author")));
+            var a = JSON.parse(Storage.get("author"));
+            var v = a[id];
+            console.log(v);
+            $("#workproduce").html(getone(v[0],"material")[0].name);
+            $("#workplanid").html(id);
+            $("#workplandescs").html(v[7]);
+            $("#workteam").html(getone(v[3],"team")[0].name);
+            $("#diework").attr("onclick","delwork("+id+")");
+            //获得当前物料列表
+            $("#materiallist").html("");
+            var list = JSON.parse(Storage.get("list"));
+            if(!(list==null||list=="null")){
+                for (var i = list.length - 1; i >= 0; i--) {
+                    console.log(list[i]);
+                    console.log(list[i][4]);
+                    console.log(id);
+                    if(list[i][4]==id){
+                        var v = list[i];
+                        console.log(v);         
+                        var html = '<tr><td>'+(i+1)+'</td><td>'+getone(v[0],"material")[0].name+'</td><td>'+v[1]+'</td><td><button onclick="dellist('+i+')" class="btn btn-danger">删除</button</td></tr>';
+                        $("#materiallist").append(html);
+                    }else{
+                        var html = '<tr><td>无</td><td>无</td><td>无</td>';
+                    }
+                }
+            }
+            $("#workinfo").modal("show");
+        }
+        function clean() {
+            // body...
+            Storage.set("author",null);
+        }
+        function material(info) {
+            // body...
+            $("#materialid").html("");
+            $("#listmaterialid").html("");
+            $("#kucunlist").html("");
+            $("#listmaterialid").append('<option value="null">请选择物料</option>');
+            for (var i = info.length - 1; i >= 0; i--) {
+                var v = info[i];
+                var html = '<option value="'+v.id+'">'+v.name+'</option>';
+                var html2 = '<div id="'+v.id+'" style="display:none">'+v.name+'-库存：<span class="'+v.id+'">'+v.num+'</span></div>';
+                $("#materialid").append(html);
+                $("#kucunlist").append(html2);
+                $("#listmaterialid").append(html);
+            }
+        }
+
+        function pf(info) {
+            // body...
+            $("#peifang").append('<option value="null">需要配方吗？</option>');
+            for (var i = info.length - 1; i >= 0; i--) {
+                var v = info[i];
+                var html = "<option value='"+v.material+"'>"+v.name+"</option>";
+                $("#peifang").append(html);
+            }
+        }
+
+        function processroute(info) {
+            // body...
+            for (var i = info.length - 1; i >= 0; i--) {
+                var v = info[i];
+                var html = '<option value="'+v.id+'">'+v.name+'</option>';
+                $("#routeid2").append(html);
+                $("#routeid").append(html);
+            }
+        }
+        function team(info) {
+            // body...
+            for (var i = info.length - 1; i >= 0; i--) {
+                var v = info[i];
+                if(v.status=="空闲中"){
+                    var html = '<option value="'+v.id+'">'+v.name+'</option>';
+                    $("#team").append(html);
+                }
+            }
+        }
+        function planvalue(name,e) {
+            // body...
+            console.log(e.value)
+            Storage.set(name,e.value);
+        }
+    
+        $(function() {
+            $(".datepicker").datepicker();
+            $(".uniform_on").uniform();
+            $(".chzn-select").chosen();
+            $('.textarea').wysihtml5();
+
+            $('#rootwizard').bootstrapWizard({onTabShow: function(tab, navigation, index) {
+                var $total = navigation.find('li').length;
+                var $current = index+1;
+                var $percent = ($current/$total) * 100;
+                $('#rootwizard').find('.bar').css({width:$percent+'%'});
+                // If it's the last tab then hide the last button and show the finish instead
+                if($current >= $total) {
+                    $('#rootwizard').find('.pager .next').hide();
+                    $('#rootwizard').find('.pager .finish').show();
+                    $('#rootwizard').find('.pager .finish').removeClass('disabled');
+                } else {
+                    $('#rootwizard').find('.pager .next').show();
+                    $('#rootwizard').find('.pager .finish').hide();
+                }
+            }});
+            // $('#rootwizard .finish').click(function() {
+                // alert('Finished!, Starting over!');
+                // $('#rootwizard').find("a[href*='tab1']").trigger('click');
+            // });
+        });
+
+        (function(){
+            //定义一个变量让setItem函数的值指向它
+            let originalSetItem = localStorage.setItem;
+            //重写setItem函数
+            localStorage.setItem = function(key,newValue){
+                //创建setItemEvent事件
+                let event = new Event("setItemEvent");
+                event.key = key;
+                event.newValue = newValue;
+                //提交setItemEvent事件
+                window.dispatchEvent(event);
+                //执行原setItem函数
+                originalSetItem.apply(this,arguments);
+            }
+        })();
+        var html = "";
+        var o = "";
+        var order = new Array();
+        //添加setItemEvent监听事件
+        window.addEventListener("setItemEvent", function (e) {
+            //监听key为author的localstorage变化
+            if(e.key === 'author'){  
+                let oldValue = localStorage.getItem("author")
+                if(oldValue !== e.newValue){
+                    console.log('localStorage的author值发生改变,由' + 
+                        oldValue + '改变为' + e.newValue);
+                    var a = JSON.parse(e.newValue);
+                    console.log($("#oldorder").val());
+                    if(e.newValue==null||e.newValue=="null"){
+                        $("#oldorder").val("");
+                        $(".btn-group").html("");
+                        o = "";
+                    }else{
+                        //顺序数组
+                        o = "";
+                        $(".btn-group").html("");
+                        order[order.length]=a.length-1;
+                        //顺序
+                        for (var i = 0; i < a.length; i++) {
+                            o = o+""+i;
+                            var v = a[i]
+                            console.log(v);         
+                            if(i%2==0){
+                                var html = '<button onclick="info('+i+')" id="process'+i+'" class="btn btn-danger">#：工作计划'+(i+1)+'<br> 生产：'+getone(v[0],"material")[0].name+'<br>描述：'+v[6]+'<br>产值：'+v[7]+'元<br></button>';
+                            }else{
+                                var html = '<button onclick="info('+i+')" id="process'+i+'" class="btn btn-default">#：工作计划'+(i+1)+'<br> 生产：'+getone(v[0],"material")[0].name+'<br>描述：'+v[6]+'<br>产值：'+v[7]+'元<br></button>';
+                            }    
+                            $(".btn-group").append(html);
+                        }
+                        $("#oldorder").val(o);
+                    }
+                }else{
+                    console.log('localStorage的author值' + e.newValue);
+                }
+            }
+        });
+
+        var html = "";
+        var o = "";
+        var order = new Array();
+        //添加setItemEvent监听事件
+        window.addEventListener("setItemEvent", function (e) {
+            //监听key为author的localstorage变化
+            if(e.key === 'list'){  
+                let oldValue = localStorage.getItem("list")
+                if(oldValue !== e.newValue){
+                    console.log('localStorage的list值发生改变,由' + 
+                        oldValue + '改变为' + e.newValue);
+                    var a = JSON.parse(e.newValue);
+                    if(e.newValue==null||e.newValue=="null"){
+                        $("#allmateriallist").html("");
+                        $("#materiallist").html("");
+                    }else{
+                        //顺序
+                        $("#allmateriallist").html("");
+                        $("#materiallist").html("");
+                        for (var i = 0; i < a.length; i++) {
+                            o = o+""+i;
+                            var v = a[i]
+                            console.log(v);     
+                            if(v[4]==parseInt($("#workplanid").html())){
+                                var html = '<tr><td>'+(i+1)+'</td><td>'+getone(v[0],"material")[0].name+'</td><td>'+v[1]+'</td><td><button onclick="dellist('+i+')" class="btn btn-danger">删除</button</td></tr>';
+                            }
+                            $("#materiallist").append(html);
+                        }
+                        for (var i = 0; i < a.length; i++) {
+                            o = o+""+i;
+                            var v = a[i]
+                            console.log(v);     
+                                var html = '<tr><td>'+(i+1)+'</td><td>'+getone(v[0],"material")[0].name+'</td><td>'+v[1]+'</td><td><button onclick="dellist('+i+')" class="btn btn-danger">删除</button</td></tr>';
+                            $("#allmateriallist").append(html);
+                        }
+                        $("#oldorder").val(o);
+                    }
+                }else{
+                    console.log('localStorage的list值' + e.newValue);
+                }
+            }
+        });
+        window.addEventListener("setItemEvent", function (e) {
+            //监听key为author的localstorage变化
+            if(e.key === 'name'){  
+                let oldValue = localStorage.getItem("name")
+                if(oldValue !== e.newValue){
+                    console.log('localStorage的list值发生改变,由' + 
+                        oldValue + '改变为' + e.newValue);
+                    $("#proname").html(e.newValue);
+                }else{
+                    console.log('localStorage的list值' + e.newValue);
+                }
+            }
+        });
+        window.addEventListener("setItemEvent", function (e) {
+            //监听key为author的localstorage变化
+            if(e.key === 'descs'){  
+                let oldValue = localStorage.getItem("descs")
+                if(oldValue !== e.newValue){
+                    console.log('localStorage的list值发生改变,由' + 
+                        oldValue + '改变为' + e.newValue);
+                    $("#prodescs").html(e.newValue);
+                }else{
+                    console.log('localStorage的list值' + e.newValue);
+                }
+            }
+        });
+     
+        (function(){
+            let originalremoveItem = localStorage.removeItem;
+            localStorage.removeItem = function(key){
+                let event = new Event("removeItemEvent");
+                event.key = key;
+                window.dispatchEvent(event);
+                originalremoveItem.apply(this,arguments);
+            }
+        })();
+        
+        window.addEventListener("removeItemEvent", function (e) {
+            if(localStorage.getItem("author")){
+                if(e.key === 'author'){
+                    console.log("localStorage的author删除成功");
+                }
+            }else{
+                console.log("localStorage无author值");
+            }
+        });
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <title>板式家具生产管理系统</title>
+        <meta charset="UTF-8"/>
+        <!-- Bootstrap -->
+        <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
+        <link href="assets/styles.css" rel="stylesheet" media="screen">
+        <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="vendors/flot/excanvas.min.js"></script><![endif]-->
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <script src="vendors/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+    </head>
+    
+    <body>
+        <div class="navbar navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span>
+                     <span class="icon-bar"></span>
+                     <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="index.html">板式家具生产管理系统</a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav pull-right">
+                            <li class="dropdown">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-user"></i><span class="adminname"></span>  <i class="caret"></i>
+
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a tabindex="-1" onclick="logout()" href="#">注销</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span3" id="sidebar">
+                     <ul class="nav nav-list bs-docs-sidenav nav-collapse collapse">
+                        <li>
+                            <a href="index.html"><i class="icon-chevron-right"></i> 主面板</a>
+                        </li>
+                        <li>
+                            <a href="material.html"><i class="icon-chevron-right"></i> 库存管理</a>
+                        </li>
+                        <li>
+                            <a href="route.html"><i class="icon-chevron-right"></i> 工艺路线管理</a>
+                        </li>
+                        <li>
+                            <a href="team.html"><i class="icon-chevron-right"></i> 班组管理</a>
+                        </li>
+                        <li>
+                            <a href="produceplan.html"><i class="icon-chevron-right"></i> 生产计划管理</a>
+                        </li>
+                        <li>
+                            <a href="admin.html"><i class="icon-chevron-right"></i> 管理员管理</a>
+                        </li>
+                    </ul>
+                </div>
+                <!--/span-->
+                <div class="span9" id="content">
+                      <!-- morris stacked chart -->
+                    <div class="row-fluid">
+                        <!-- block -->
+                        <div class="block">
+                            <div class="navbar navbar-inner block-header">
+                                <div class="muted pull-left">数据修改</div>
+                            </div>
+                            <div class="block-content collapse in">
+                                <div class="span12">
+                                     <form class="form-horizontal">
+                                      <fieldset>
+                                        <legend id="name"></legend>
+                                        <input class="input-xlarge focused" id="id" type="text" style="display: none">
+                                        <div id="processroute" style="display: none">
+                                            <div class="control-group">
+                                              <label class="control-label" for="focusedInput">工艺名</label>
+                                              <div class="controls">
+                                                <input class="input-xlarge focused" id="processroutename" type="text" value="请输入工艺名">
+                                              </div>
+                                            </div>
+                                            <div class="control-group">
+                                              <label class="control-label" for="focusedInput">描述</label>
+                                              <div class="controls">
+                                                <textarea id="processroutedescs" placeholder="请输入相关描述">
+                                                    
+                                                </textarea>
+                                              </div>
+                                            </div>
+                                        </div>
+                                        <div id="team" style="display: none">
+                                            <div class="control-group">
+                                              <label class="control-label" for="focusedInput">班组名</label>
+                                              <div class="controls">
+                                                <input class="input-xlarge focused" id="teamname" type="text" value="请输入班组名">
+                                              </div>
+                                            </div>
+                                            <div class="control-group">
+                                              <label class="control-label" for="focusedInput">每小时创造收益（工作能力）</label>
+                                              <div class="controls">
+                                                <input class="input-xlarge focused" id="moneyAhour" type="text" value="请输入工作能力">
+                                              </div>
+                                            </div>
+                                            <div class="control-group">
+                                              <label class="control-label" for="focusedInput">描述</label>
+                                              <div class="controls">
+                                                <textarea id="teamdescs" placeholder="请输入相关描述">
+                                                    
+                                                </textarea>
+                                              </div>
+                                            </div>
+                                        </div>
+                                         <div id="admin" style="display: none">
+                                            <div class="control-group">
+                                              <label class="control-label" for="focusedInput">姓名</label>
+                                              <div class="controls">
+                                                <input class="input-xlarge focused" id="adminname" type="text" value="请输入姓名">
+                                              </div>
+                                            </div>
+                                            <div class="control-group">
+                                              <label class="control-label" for="focusedInput">用户名</label>
+                                              <div class="controls">
+                                                <input class="input-xlarge focused" id="username" type="text" value="请输入用户名">
+                                              </div>
+                                            </div>
+                                            <div class="control-group">
+                                              <label class="control-label" for="focusedInput">密码</label>
+                                              <div class="controls">
+                                                <input class="input-xlarge focused" id="password" type="text" value="请输入密码">
+                                              </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions">
+                                          <button type="button" id="change" class="btn btn-primary">修改</button>
+                                        </div>
+                                      </fieldset>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /block -->
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <footer>
+                <p>&copy; 2020 - 毕业设计</p>
+            </footer>
+        </div>
+        <!--/.fluid-container-->
+        <link href="vendors/datepicker.css" rel="stylesheet" media="screen">
+        <link href="vendors/uniform.default.css" rel="stylesheet" media="screen">
+        <link href="vendors/chosen.min.css" rel="stylesheet" media="screen">
+
+        <link href="vendors/wysiwyg/bootstrap-wysihtml5.css" rel="stylesheet" media="screen">
+
+        <script src="vendors/jquery-1.9.1.js"></script>
+        <script src="bootstrap/js/bootstrap.min.js"></script>
+        <script src="vendors/jquery.uniform.min.js"></script>
+        <script src="vendors/chosen.jquery.min.js"></script>
+        <script src="vendors/bootstrap-datepicker.js"></script>
+
+        <script src="vendors/wysiwyg/wysihtml5-0.3.0.js"></script>
+        <script src="vendors/wysiwyg/bootstrap-wysihtml5.js"></script>
+
+        <script src="vendors/wizard/jquery.bootstrap.wizard.min.js"></script>
+
+	<script type="text/javascript" src="vendors/jquery-validation/dist/jquery.validate.min.js"></script>
+	<script src="assets/form-validation.js"></script>
+        
+    <script src="assets/scripts.js"></script>
+	<script src="static/base.js"></script>
+    </body>
+    <script type="text/javascript">
+        var db = getQueryVariable("db");
+
+        var info = getone(getQueryVariable("id"),db);
+        $("#"+db+"name").val(info[0].name);
+        $("#"+db+"descs").val(info[0].descs);
+        $("#moneyAhour").val(info[0].moneyAhour);
+        $("#username").val(info[0].username);
+        $("#password").val(info[0].password);
+
+        $("#"+db).show();
+
+        $("#change").click(function() {
+            // body...
+            var formData = new FormData();
+               formData.append("id", getQueryVariable("id"));
+               formData.append("db",db);
+               formData.append("name", $("#"+db+"name").val());
+               if(db=="admin"){
+                   formData.append("username", $("#username").val());
+                   formData.append("password", $("#password").val());
+               }else if(db=="team"){
+                   formData.append("moneyAhour", $("#moneyAhour").val());
+                   formData.append("descs", $("#"+db+"descs").val());
+               }else{
+                   formData.append("descs", $("#"+db+"descs").val());
+               }
+
+               $.ajax({
+                   type: "POST",           //因为是传输文件，所以必须是post
+                   url: '/banshi/public/index/base/change',         //对应的后台处理类的地址
+                   data: formData,
+                   processData: false,
+                   contentType: false,
+                   dataType:"json",
+                   success: function (data) {
+                        console.log(data);
+                       alert(data.meg);
+                       if(data.status==1){
+                               window.location.reload();
+                       }
+                   }
+               });
+        })
+    </script>
+
+</html>
